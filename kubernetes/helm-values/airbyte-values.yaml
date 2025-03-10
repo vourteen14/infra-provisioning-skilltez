@@ -1,0 +1,53 @@
+global:
+  airbyte:
+    resourceLimits: false
+    ingress:
+      enabled: true
+      className: emissary
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+        - host: airbyte.cloudtest5.my.id
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: airbyte-tls-secret
+          hosts:
+            - airbyte.cloudtest5.my.id
+  postgresql:
+    enabled: true
+    persistence:
+      enabled: false
+webapp:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+server:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+worker:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+db:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi

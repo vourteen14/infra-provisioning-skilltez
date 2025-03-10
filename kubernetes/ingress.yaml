@@ -1,0 +1,20 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: airbyte-mapping
+  namespace: airbyte
+spec:
+  prefix: /
+  service: airbyte-airbyte-webapp-svc.airbyte
+  host: airbyte.cloudtest5.my.id
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Host
+metadata:
+  name: host-certificate
+  namespace: airbyte
+spec:
+  hostname: airbyte.cloudtest5.my.id
+  tlsSecret:
+    name: airbyte-tls-secret
+    namespace: airbyte
