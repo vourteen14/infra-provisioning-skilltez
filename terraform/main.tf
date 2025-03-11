@@ -1,8 +1,3 @@
-resource "google_service_account" "angga_suriana_gke_sa" {
-  account_id   = "angga-suriana-gke-sa"
-  display_name = "GKE Workload Identity SA"
-}
-
 resource "google_compute_network" "angga_suriana_vpc" {
   name                    = "angga-suriana-vpc"
   auto_create_subnetworks = false
@@ -19,16 +14,16 @@ resource "google_container_cluster" "angga_suriana_gke_cluster" {
   name     = "angga-suriana-gke-cluster"
   location = var.zone
   networking_mode = "VPC_NATIVE"
-  
+
   network    = google_compute_network.angga_suriana_vpc.name
   subnetwork = google_compute_subnetwork.angga_suriana_subnet.name
-  
+
   deletion_protection = false
   remove_default_node_pool = true
   initial_node_count = 1
 
-  workload_identity_config {
-    workload_pool = "${var.project_id}.svc.id.goog"
+  logging_config {
+    enable_components = []
   }
 }
 
@@ -55,32 +50,6 @@ resource "kubernetes_namespace" "angga_suriana_namespace" {
   metadata {
     name = each.value
   }
-  
+
   depends_on = [google_container_cluster.angga_suriana_gke_cluster, google_container_node_pool.angga_suriana_gke_node_pool]
-}
-
-resource "kubernetes_service_account" "angga_suriana_ksa" {
-  for_each = toset(var.namespaces)
-
-  metadata {
-    name      = "angga-suriana-ksa"
-    namespace = each.value
-    annotations = {
-      "iam.gke.io/gcp-service-account" = google_service_account.angga_suriana_gke_sa.email
-    }
-  }
-
-  depends_on = [kubernetes_namespace.angga_suriana_namespace]
-}
-
-resource "google_project_iam_binding" "angga_suriana_iam_binding" {
-  for_each = toset(var.namespaces)
-  project  = var.project_id
-  role     = "roles/iam.workloadIdentityUser"
-
-  members = [
-    "serviceAccount:${var.project_id}.svc.id.goog[${each.value}/angga-suriana-ksa]"
-  ]
-
-  depends_on = [kubernetes_service_account.angga_suriana_ksa]
 }

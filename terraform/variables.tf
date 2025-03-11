@@ -1,6 +1,6 @@
 variable "project_id" {
   type        = string
-  default     = "angga-suriana"
+  default     = "cloudtest5-453217"
 }
 
 variable "region" {
